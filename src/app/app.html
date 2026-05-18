@@ -1,7 +1,10 @@
-<div class="welcome-container">
-  <div class="welcome-card">
-    <h1>Лабораторна робота №1</h1>
-    <h2>Ініціалізація проєкту та основи Angular</h2>
-    <p class="author">Виконала: студентка групи ПМ-22 <br><strong>Кузьмич Адріана</strong></p>
+<div class="resume-wrapper">
+  <div class="resume-card">
+    <app-sidebar [data]="resumeInfo()"></app-sidebar>
+    
+    <app-main-content 
+      [data]="resumeInfo()" 
+      (skillSelect)="onSkillSelected($event)">
+    </app-main-content>
   </div>
 </div>
