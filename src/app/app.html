@@ -1,10 +1,25 @@
-<div class="resume-wrapper">
+<div style="background: #f0f0f0; padding: 15px; margin-bottom: 20px; border-radius: 8px; text-align: center;">
+  @if (!isEditing()) {
+    <button (click)="isEditing.set(true)" style="padding: 10px 20px; font-weight: bold; cursor: pointer;">
+      Редагувати профіль (POST)
+    </button>
+  } @else {
+    <div style="display: flex; gap: 10px; justify-content: center; align-items: center;">
+      <input [(ngModel)]="newName" type="text" style="padding: 8px; width: 250px; font-size: 16px;" />
+      <input [(ngModel)]="newlastName" type="text" style="padding: 8px; width: 400px; font-size: 16px;" />
+      <button (click)="saveProfile()" style="padding: 8px 15px; background: rgb(11, 22, 11); color: white; border: none; cursor: pointer;">
+        Зберегти на сервер
+      </button>
+      <button (click)="isEditing.set(false)" style="padding: 8px 15px; background: gray; color: white; border: none; cursor: pointer;">
+        Скасувати
+      </button>
+    </div>
+  }
+</div>
+
+@if (resumeInfo()) {
   <div class="resume-card">
     <app-sidebar [data]="resumeInfo()"></app-sidebar>
-    
-    <app-main-content 
-      [data]="resumeInfo()" 
-      (skillSelect)="onSkillSelected($event)">
-    </app-main-content>
+    <app-main-content [data]="resumeInfo()" (skillSelect)="onSkillSelected($event)"></app-main-content>
   </div>
-</div>
+}

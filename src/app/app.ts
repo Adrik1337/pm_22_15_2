@@ -1,56 +1,65 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { Sidebar } from './sidebar/sidebar';
 import { MainContentComponent } from './main-content/main-content';
-import { ResumeData } from './models/resume.model';
+import { ResumeService } from './services/resume';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [Sidebar, MainContentComponent],
+  imports: [Sidebar, MainContentComponent, FormsModule],
   templateUrl: './app.html',
-  styleUrls: ['./app.scss']
+  styleUrl: './app.scss'
 })
-export class AppComponent {
-  resumeInfo = signal<ResumeData>({
-    name: 'Jhon',
-    lastName: 'Parker',
-    role: 'UX Designer',
-    phone: '+000 123 456 789',
-    email: 'yourname@gmail.com',
-    address: 'Your Street Address, Town/City, zip code',
-    about: 'I\'m Parker consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo',
-    education: [
-      { years: '2005-2007', degree: 'Degree / Major Name', college: 'Your College name here' },
-      { years: '2005-2007', degree: 'Degree / Major Name', college: 'Your College name here' }
-    ],
-    skills: [
-      { name: 'Adobe Photoshop', level: 4.2 },
-      { name: 'Adobe Illustrator', level: 4.4 },
-      { name: 'Adobe Indesign', level: 4 },
-      { name: 'Microsoft Office', level: 4.5 },
-      { name: 'MS Powerpoint', level: 4 }
-    ],
-    experience: [
-      { 
-        role: 'Senior UX Designer', 
-        company: 'Company Name/Location', 
-        period: '2019 - present', 
-        description: 'Lorem ipsum dolor sit amet, this is a theana consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magand na aliqua. Ut enim ad minim' 
+export class AppComponent implements OnInit {
+  private resumeService = inject(ResumeService);
+  
+  resumeInfo = signal<any>(null);
+  isEditing = signal<boolean>(false);
+  
+  newName = signal<string>('');
+  newlastName = signal<string>(''); 
+
+  ngOnInit() {
+    this.loadData();
+  }
+
+  loadData() {
+    this.resumeService.getResumeData().subscribe({
+      next: (data: any) => {
+        this.resumeInfo.set(data);
+        
+        if (data && data.name) {
+          const nameParts = data.name.trim().split(' ');
+          this.newName.set(nameParts[0] || '');
+          this.newlastName.set(nameParts.slice(1).join(' ') || '');
+        }
       },
-      { 
-        role: 'Junior UX Designer', 
-        company: 'Company Name/Location', 
-        period: '2015 - 2019', 
-        description: 'Lorem ipsum dolor sit amet, this is a theana consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magand na aliqua. Ut enim ad minim' 
+      error: (err: any) => console.error('Помилка завантаження даних:', err)
+    });
+  }
+
+  saveProfile() {
+    // Зберігаємо ВСІ поля з resumeInfo() і міняємо тільки name
+    const updatedData = {
+      ...this.resumeInfo(),
+      name: `${this.newName()} ${this.newlastName()}`.trim()
+    };
+
+    this.resumeService.updateResumeData(updatedData).subscribe({
+      next: (response: any) => {
+        console.log('Сервер каже:', response.message);
+        this.resumeInfo.set(updatedData);
+        this.isEditing.set(false);
+      },
+      error: (err: any) => {
+        alert('Помилка збереження!');
+        console.error(err);
       }
-    ],
-    references: [
-      { name: 'Jhon Smith', title: 'Company name/Title', phone: '0123 456 7890' },
-      { name: 'Jhon Anderson', title: 'Company name/Title', phone: '0123 456 7890' }
-    ]
-  });
+    });
+  }
 
   onSkillSelected(skillName: string) {
-    console.log(`Клікнуто на навичку: ${skillName}`);
+    console.log('Skill selected:', skillName);
   }
 }
