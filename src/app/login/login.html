@@ -1,0 +1,91 @@
+<div class="auth-container" style="max-width: 450px; margin: 60px auto; padding: 30px; background: #fff; border: 1px solid #ccc; border-radius: 8px; font-family: sans-serif; box-shadow: 0 4px 10px rgba(0,0,0,0.08);">
+  
+  <div style="display: flex; margin-bottom: 25px; border-bottom: 2px solid #eee;">
+    <button (click)="isSignUp.set(false)" 
+            [style.border-bottom]="!isSignUp() ? '3px solid #007bff' : 'none'"
+            [style.color]="!isSignUp() ? '#007bff' : '#666'"
+            style="flex: 1; padding: 10px; background: none; border: none; font-weight: bold; cursor: pointer; font-size: 16px;">
+      Вхід
+    </button>
+    <button (click)="isSignUp.set(true)" 
+            [style.border-bottom]="isSignUp() ? '3px solid #28a745' : 'none'"
+            [style.color]="isSignUp() ? '#28a745' : '#666'"
+            style="flex: 1; padding: 10px; background: none; border: none; font-weight: bold; cursor: pointer; font-size: 16px;">
+      Реєстрація
+    </button>
+  </div>
+
+  @if (!isSignUp()) {
+    <form #loginForm="ngForm" (ngSubmit)="onSubmitLogin(loginForm)">
+      <h3 style="margin-top: 0; color: #333; text-align: center; margin-bottom: 20px;">Авторизація</h3>
+      
+      <div style="margin-bottom: 15px;">
+        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Електронна пошта:</label>
+        <input type="email" name="loginEmail" ngModel required email placeholder="example@mail.com" style="width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;" />
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Пароль:</label>
+        <input type="password" name="loginPassword" ngModel required placeholder="••••••••" style="width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;" />
+      </div>
+
+      <button type="submit" [disabled]="loginForm.invalid" 
+              style="width: 100%; padding: 12px; color: white; border: none; font-weight: bold; border-radius: 4px; transition: 0.3s;"
+              [style.background]="loginForm.invalid ? '#6c757d' : '#007bff'"
+              [style.cursor]="loginForm.invalid ? 'not-allowed' : 'pointer'">
+        Увійти в кабінет
+      </button>
+    </form>
+  }
+  
+  @else {
+    <form #regForm="ngForm" (ngSubmit)="onSubmitRegister(regForm)">
+      <h3 style="margin-top: 0; color: #333; text-align: center; margin-bottom: 20px;">Створення акаунту</h3>
+      
+      <div style="margin-bottom: 15px;">
+        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Ваше ім'я:</label>
+        <input type="text" name="regName" ngModel #regNameInput="ngModel" required minlength="3" placeholder="Введіть ім'я" style="width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;" />
+        <div *ngIf="regNameInput.invalid && (regNameInput.dirty || regNameInput.touched)" style="color: red; font-size: 13px; margin-top: 5px;">
+          <small *ngIf="regNameInput.errors?.['required']">Ім'я обов'язкове.</small>
+          <small *ngIf="regNameInput.errors?.['minlength']">Мінімум 3 символи.</small>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 15px;">
+        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Поточна адреса проживання:</label>
+        <input type="text" name="regAddress" ngModel #regAddressInput="ngModel" required minlength="5" placeholder="Львів, вул. Бандери, 12" style="width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;" />
+        
+        <div *ngIf="regAddressInput.invalid && (regAddressInput.dirty || regAddressInput.touched)" style="color: red; font-size: 13px; margin-top: 5px;">
+          <small *ngIf="regAddressInput.errors?.['required']">Адреса обов'язакова.</small>
+          <small *ngIf="regAddressInput.errors?.['minlength']">Мінімум 5 символів.</small>
+        </div>
+        <div *ngIf="regAddressInput.value && !isAddressValid(regAddressInput.value) && !regAddressInput.errors?.['minlength']" style="color: red; font-size: 13px; margin-top: 5px;">
+          <small>Некоректний формат адреси (очікується: Місто, Вулиця, Будинок).</small>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Електронна пошта:</label>
+        <input type="email" name="regEmail" ngModel #regEmailInput="ngModel" required email minlength="5" placeholder="example@mail.com" style="width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;" />
+        <div *ngIf="regEmailInput.invalid && (regEmailInput.dirty || regEmailInput.touched)" style="color: red; font-size: 13px; margin-top: 5px;">
+          <small *ngIf="regEmailInput.errors?.['required']">Електронна пошта обов'язкова.</small>
+          <small *ngIf="regEmailInput.errors?.['email'] || regEmailInput.errors?.['minlength']">Некоректний формат емейлу.</small>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Придумайте пароль для входу:</label>
+        <input type="password" name="regPassword" ngModel #regPasswordInput="ngModel" required minlength="4" placeholder="••••••••" style="width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;" />
+        <div *ngIf="regPasswordInput.invalid && (regPasswordInput.dirty || regPasswordInput.touched)" style="color: red; font-size: 13px; margin-top: 5px;">
+          <small *ngIf="regPasswordInput.errors?.['required']">Пароль обов'язковий.</small>
+          <small *ngIf="regPasswordInput.errors?.['minlength']">Пароль має бути не менше 4 символів.</small>
+        </div>
+      </div>
+
+      <button type="submit" [disabled]="regForm.invalid || !isAddressValid(regAddressInput.value)" ...>
+        Зареєструватися
+      </button>
+    </form>
+  }
+
+</div>

@@ -1,107 +1,15 @@
-<div class="registration-container" style="max-width: 600px; margin: 20px auto; padding: 20px; background: #fff; border: 1px solid #ccc; border-radius: 8px; font-family: sans-serif;">
-  <h2 style="text-align: center; margin-top: 0; color: #333;">Реєстрація на конференцію (Шаблонна форма)</h2>
+<nav style="background: #333; padding: 15px; display: flex; gap: 20px; font-family: sans-serif; align-items: center;">
+  <a routerLink="/login" routerLinkActive="active" style="color: white; text-decoration: none; font-weight: bold;">Вхід / Реєстрація</a>
   
-  <form #regForm="ngForm" (ngSubmit)="onSubmitTemplate(regForm)">
+  @if (authService.isLoggedIn()) {
+    <a routerLink="/resume" routerLinkActive="active" style="color: white; text-decoration: none; font-weight: bold;">Моє Резюме</a>
     
-    <div style="margin-bottom: 15px;">
-      <label style="display: block; font-weight: bold; margin-bottom: 5px;">Ваше ім'я:</label>
-      <input type="text" name="regName" ngModel #regNameInput="ngModel" required minlength="3" placeholder="Введіть ім'я" style="width: 100%; padding: 8px; box-sizing: border-box;" />
-      <div *ngIf="regNameInput.invalid && (regNameInput.dirty || regNameInput.touched)" style="color: red; font-size: 13px; margin-top: 5px;">
-        <small *ngIf="regNameInput.errors?.['required']">Ім'я обов'язкове для заповнення.</small>
-        <small *ngIf="regNameInput.errors?.['minlength']">Ім'я має містити щонайменше 3 символи.</small>
-      </div>
-    </div>
-
-    <div style="margin-bottom: 15px;">
-      <label style="display: block; font-weight: bold; margin-bottom: 5px;">Поточна адреса проживання (для резюме):</label>
-      <input type="text" name="regAddress" ngModel #regAddressInput="ngModel" required minlength="5" placeholder="Львів, вул. Бандери, 12" style="width: 100%; padding: 8px; box-sizing: border-box;" />
-      <div *ngIf="regAddressInput.invalid && (regAddressInput.dirty || regAddressInput.touched)" style="color: red; font-size: 13px; margin-top: 5px;">
-        <small *ngIf="regAddressInput.errors?.['required']">Адреса обов'язкова для автоматичного оновлення.</small>
-        <small *ngIf="regAddressInput.errors?.['minlength']">Адреса надто коротка (мінімум 5 символів).</small>
-      </div>
-        <div *ngIf="regAddressInput.value && !isAddressValid(regAddressInput.value) && !regAddressInput.errors?.['minlength']">
-          <small>Некоректний формат адреси (очікується: Місто, Вулиця, Будинок).</small>
-      </div>
-    </div>
-
-    <div style="margin-bottom: 15px;">
-      <label style="display: block; font-weight: bold; margin-bottom: 5px;">Електронна пошта (для резюме):</label>
-      <input type="email" name="regEmail" ngModel #regEmailInput="ngModel" required email minlength="5" placeholder="example@mail.com" style="width: 100%; padding: 8px; box-sizing: border-box;" />
-      <div *ngIf="regEmailInput.invalid && (regEmailInput.dirty || regEmailInput.touched)" style="color: red; font-size: 13px; margin-top: 5px;">
-        <small *ngIf="regEmailInput.errors?.['required']">Електронна пошта обов'язкова.</small>
-        <small *ngIf="regEmailInput.errors?.['email'] || regEmailInput.errors?.['minlength']">Некоректний формат емейлу (наприклад: name@domain.com).</small>
-      </div>
-    </div>
-    
-
-<button type="submit" [disabled]="regForm.invalid || !isAddressValid(regAddressInput.value)" 
-            style="width: 100%; padding: 10px; color: white; border: none; font-weight: bold; border-radius: 4px; transition: 0.3s;"
-            [style.background]="(regForm.invalid || !isAddressValid(regAddressInput.value)) ? '#6c757d' : '#28a745'"
-            [style.cursor]="(regForm.invalid || !isAddressValid(regAddressInput.value)) ? 'not-allowed' : 'pointer'">
-      Зареєструватися та оновити контакти в резюме
+    <button (click)="logout()" style="margin-left: auto; background: #dc3545; color: white; border: none; padding: 6px 12px; cursor: pointer; border-radius: 4px; font-weight: bold;">
+      Вийти
     </button>
-  </form>
-</div>
-<hr style="border: 0; height: 1px; background: #ccc; margin: 40px 0;">
-
-<div style="background: #f8f9fa; padding: 20px; margin: 20px auto; max-width: 600px; border: 1px solid #ddd; border-radius: 8px; text-align: center; font-family: sans-serif;">
-  <h3 style="margin-top: 0; color: #333;">Керування профілем резюме (Реактивна форма)</h3>
-  
-  @if (!isEditing()) {
-    <button (click)="isEditing.set(true); initForm()" style="padding: 10px 20px; font-weight: bold; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
-      Редагувати профіль (POST)
-    </button>
-  } @else {
-    <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" style="display: flex; flex-direction: column; gap: 15px; text-align: left;">
-      
-      <div style="display: flex; gap: 10px;">
-        <div style="flex: 1;">
-          <label style="display: block; font-weight: bold; margin-bottom: 5px;">Ім'я:</label>
-          <input formControlName="firstName" type="text" style="width: 100%; padding: 8px; box-sizing: border-box;" />
-        </div>
-        <div style="flex: 1;">
-          <label style="display: block; font-weight: bold; margin-bottom: 5px;">Прізвище:</label>
-          <input formControlName="lastName" type="text" style="width: 100%; padding: 8px; box-sizing: border-box;" />
-        </div>
-      </div>
-      
-      <div>
-        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Телефон:</label>
-        <input formControlName="phone" type="text" style="width: 100%; padding: 8px; box-sizing: border-box;" />
-      </div>
-
-      <div>
-        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Електронна пошта:</label>
-        <input formControlName="email" type="text" style="width: 100%; padding: 8px; box-sizing: border-box;" />
-      </div>
-
-      <div>
-        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Адреса проживання:</label>
-        <input formControlName="address" type="text" style="width: 100%; padding: 8px; box-sizing: border-box;" />
-      </div>
-
-      <div *ngIf="profileForm.errors?.['namesMatch']" style="color: #dc3545; font-size: 14px; font-weight: bold; background: #f8d7da; padding: 10px; border-radius: 4px;">
-        Помилка: Ім'я та Прізвище не можуть бути однаковими!
-      </div>
-
-      <div style="display: flex; gap: 10px; justify-content: center;">
-        <button type="submit" [disabled]="profileForm.invalid" style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
-          Зберегти зміни (POST)
-        </button>
-        <button type="button" (click)="isEditing.set(false)" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">
-          Скасувати
-        </button>
-      </div>
-
-    </form>
   }
+</nav>
+
+<div style="padding: 20px; background: #f4f6f9; min-height: calc(100vh - 50px); font-family: sans-serif;">
+  <router-outlet></router-outlet>
 </div>
-
-<hr style="border: 0; height: 1px; background: #ccc; margin: 40px 0;">
-
-@if (resumeInfo()) {
-  <div class="resume-card" style="display: flex; max-width: 1000px; margin: 0 auto; background: #fff; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
-    <app-sidebar [data]="resumeInfo()"></app-sidebar>
-    <app-main-content [data]="resumeInfo()" (skillSelect)="onSkillSelected($event)"></app-main-content>
-  </div>
-}

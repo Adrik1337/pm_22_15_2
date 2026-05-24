@@ -47,7 +47,7 @@ import { ResumeData } from '../models/resume.model';
   `,
   styles: [`
     .main-content { background: #fff; }
-    .image-placeholder { width: 100%; height: 260px; background: #e2e2e2; position: relative; }
+    .image-placeholder { width: 100%; height: 100%; background: #e2e2e2; position: relative;}
     .photo-bg { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background: #c8c8cb; color: #555; font-size: 12px; letter-spacing: 2px; font-weight: bold;}
     .about-box { background: #0f141c; color: #fff; padding: 30px; margin-bottom: 30px; }
     .about-box h3 { margin: 0 0 10px 0; font-size: 15px; letter-spacing: 1.5px; font-weight: bold; background: #ffffff; color: #0f141c; padding: 0px 10px; display: inline-block; }
@@ -55,8 +55,8 @@ import { ResumeData } from '../models/resume.model';
     .section-right { padding: 10px; margin-bottom: 30px; }
     .title-dark { width: 160px; background: #000000; color: #fff; padding: 3px 10px; display: inline-block; font-size: 16px; letter-spacing: 1.5px; margin: 0 0 15px 0; margin-bottom: 30px; }
     .skill-row { display: flex; align-items: center; margin-bottom: 12px; cursor: pointer; }
-    .skill-name { width: 150px; font-size: 13px; color: #333; font-weight: 600; }
-    .progress-bar { flex-grow: 1; background: #e8e8e8; height: 5px; position: relative; margin-right: 120px; margin-left: 10px;}
+    .skill-name { width: 150px; font-size: 14px; color: #333; font-weight: 600; }
+    .progress-bar { width: 17px; background: #e8e8e8; height: 5px; position: relative; margin-left: 10px; display: inline-block; vertical-align: middle;}
     .progress-fill { background: #000; height: 100%; }
     .exp-block { margin-bottom: 20px; margin-right: 70px;}
     .exp-block h4 { margin: 0 0 3px 0; font-size: 15px; color: #000; font-weight: 600; }
