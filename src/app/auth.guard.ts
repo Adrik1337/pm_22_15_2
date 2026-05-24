@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { AuthService } from './services/services'; // перевір, чи такий шлях до сервісу
+import { AuthService } from './services/services';
 
 export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
@@ -11,7 +11,7 @@ export const authGuard: CanActivateFn = (route, state) => {
     return true; // Дозволяємо перейти на резюме
   } else {
     alert('Доступ заборонено! Спочатку потрібно авторизуватися.');
-    router.navigate(['/login']); // Силком повертаємо на сторінку входу
+    router.navigate(['/login']);
     return false;
   }
 };

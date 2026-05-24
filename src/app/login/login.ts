@@ -24,36 +24,60 @@ export class LoginComponent {
   }
 
  // Метод для Реєстрації
-  onSubmitRegister(form: any) {
-    if (form.valid && this.isAddressValid(form.value.regAddress)) {
-      // Зберігаємо емейл, ім'я, адресу ТА ПАРОЛЬ
-      localStorage.setItem('registeredEmail', form.value.regEmail);
-      localStorage.setItem('registeredName', form.value.regName);
-      localStorage.setItem('registeredPassword', form.value.regPassword); // Додали пароль
-      localStorage.setItem('userAddress', form.value.regAddress);
-      localStorage.setItem('userEmail', form.value.regEmail);
+ onSubmitRegister(form: any) {
+  if (form.valid && this.isAddressValid(form.value.regAddress)) {
+    // 1. Дістаємо поточний список користувачів або створюємо порожній масив, якщо ще нікого немає
+    const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
 
-      alert('Реєстрація успішна! Перемикаємо на Вхід.');
-      this.isSignUp.set(false);
+    // 2. Створюємо об'єкт з даними нового користувача
+    const newUser = {
+      name: form.value.regName,
+      email: form.value.regEmail,
+      password: form.value.regPassword,
+      address: form.value.regAddress
+    };
+
+    // 3. Перевіряємо, чи такий емейл вже не зайнятий
+    const userExists = users.some((u: any) => u.email === newUser.email);
+    if (userExists) {
+      alert('Користувач з такою поштою вже зареєстрований!');
+      return;
     }
+
+    // 4. Пушимо нового користувача в масив і зберігаємо весь список у вигляді рядка
+    users.push(newUser);
+    localStorage.setItem('registeredUsers', JSON.stringify(users));
+
+    // Тимчасово зберігаємо поточного для відображення в резюме
+    localStorage.setItem('userEmail', newUser.email);
+    localStorage.setItem('userAddress', newUser.address);
+
+    alert('Реєстрація успішна!');
+    this.isSignUp.set(false);
   }
+}
 
   // Метод для Входу
  onSubmitLogin(form: any) {
-    if (form.valid) {
-      const savedEmail = localStorage.getItem('registeredEmail');
-      const savedPassword = localStorage.getItem('registeredPassword');
-      
-      // Виведемо в консоль для діагностики
-      console.log('Що ввели у форму:', form.value.loginEmail, form.value.loginPassword);
-      console.log('Що лежить в пам\'яті:', savedEmail, savedPassword);
+  if (form.valid) {
+    // 1. Дістаємо масив усіх користувачів
+    const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
 
-      if (form.value.loginEmail === savedEmail && form.value.loginPassword === savedPassword) {
-        this.authService.login();
-        this.router.navigate(['/resume']);
-      } else {
-        alert('Неправильний емейл або пароль! Перевірте консоль.');
-      }
+    // 2. Шукаємо користувача, у якого збігаються і пошта, і пароль
+    const foundUser = users.find((u: any) => 
+      u.email === form.value.loginEmail && u.password === form.value.loginPassword
+    );
+
+    if (foundUser) {
+      // Якщо знайшли — записуємо його дані як поточну сесію
+      localStorage.setItem('userEmail', foundUser.email);
+      localStorage.setItem('userAddress', foundUser.address);
+
+      this.authService.login();
+      this.router.navigate(['/resume']);
+    } else {
+      alert('Неправильний емейл або пароль!');
     }
   }
+}
 }

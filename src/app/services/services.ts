@@ -16,7 +16,7 @@ export class AuthService {
   // 3. Метод для виходу
   logout() {
     localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('userEmail');   // очищаємо за собою і дані форми
+    localStorage.removeItem('userEmail');
     localStorage.removeItem('userAddress');
     this.isLoggedIn.set(false);
   }
